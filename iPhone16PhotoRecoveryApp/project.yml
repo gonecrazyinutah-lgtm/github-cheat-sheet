@@ -1,0 +1,39 @@
+name: Finding
+bundleIdPrefix: com.finding
+xcodeVersion: "15.0"
+settings:
+  base:
+    IPHONEOS_DEPLOYMENT_TARGET: 17.0
+    SWIFT_VERSION: 5.0
+    MARKETING_VERSION: 1.1
+    CURRENT_PROJECT_VERSION: 2
+targets:
+  Finding:
+    type: application
+    platform: iOS
+    deploymentTarget: "17.0"
+    sources:
+      - .
+      - Managers
+      - Models
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.finding.app
+        INFOPLIST_FILE: Info.plist.template
+        CODE_SIGNING_ALLOWED: YES
+        INFOPLIST_KEY_CFBundleDisplayName: Finding
+        INFOPLIST_KEY_LSApplicationCategoryType: public.app-category.utilities
+        INFOPLIST_KEY_NSPhotoLibraryUsageDescription: Finding needs Full Photo Library access to audit, unhide Hidden album, and export all photos/videos to your USB-C drive. Includes hidden items and Takeout import.
+        INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription: Finding saves organized exports.
+        INFOPLIST_KEY_UIFileSharingEnabled: YES
+        INFOPLIST_KEY_LSSupportsOpeningDocumentsInPlace: YES
+    dependencies:
+      - package: ZIPFoundation
+      - package: GoogleSignIn-iOS
+packages:
+  ZIPFoundation:
+    url: https://github.com/weichsel/ZIPFoundation.git
+    from: 0.9.19
+  GoogleSignIn-iOS:
+    url: https://github.com/google/GoogleSignIn-iOS.git
+    from: 7.1.0

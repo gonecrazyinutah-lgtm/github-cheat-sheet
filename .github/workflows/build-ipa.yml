@@ -1,0 +1,92 @@
+name: Build Finding IPA
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'iPhone16PhotoRecoveryApp/**'
+
+jobs:
+  build:
+    runs-on: macos-14
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Select Xcode
+        run: sudo xcode-select -s /Applications/Xcode_15.4.app || sudo xcode-select -s /Applications/Xcode.app
+      
+      - name: Show Xcode version
+        run: xcodebuild -version
+      
+      - name: Create Xcode project with xcodegen
+        run: |
+          brew install xcodegen || true
+          cat > project.yml << 'YML'
+          name: Finding
+          bundleIdPrefix: com.finding
+          targets:
+            Finding:
+              type: application
+              platform: iOS
+              deploymentTarget: "17.0"
+              sources:
+                - iPhone16PhotoRecoveryApp
+              settings:
+                base:
+                  PRODUCT_BUNDLE_IDENTIFIER: com.finding.app
+                  INFOPLIST_FILE: iPhone16PhotoRecoveryApp/Info.plist.template
+                  SWIFT_VERSION: 5.0
+                  IPHONEOS_DEPLOYMENT_TARGET: 17.0
+                  CODE_SIGNING_ALLOWED: NO
+              info:
+                path: iPhone16PhotoRecoveryApp/Info.plist.template
+                properties:
+                  CFBundleName: Finding
+                  CFBundleDisplayName: Finding
+          YML
+          xcodegen generate || echo "xcodegen failed, trying manual"
+      
+      - name: Build Archive (unsigned for testing)
+        run: |
+          mkdir -p build
+          xcodebuild archive \
+            -project Finding.xcodeproj \
+            -scheme Finding \
+            -configuration Release \
+            -archivePath build/Finding.xcarchive \
+            -destination "generic/platform=iOS" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" || \
+          xcodebuild -list || ls -R
+      
+      - name: Create IPA (unsigned)
+        run: |
+          mkdir -p build/ipa/Payload
+          # For unsigned IPA, we need to build app bundle first
+          xcodebuild build \
+            -project Finding.xcodeproj \
+            -scheme Finding \
+            -configuration Release \
+            -sdk iphoneos \
+            -derivedDataPath build/DerivedData \
+            CODE_SIGNING_ALLOWED=NO || true
+          
+          APP_PATH=$(find build/DerivedData -name "*.app" -type d | head -n1)
+          if [ -n "$APP_PATH" ]; then
+            cp -R "$APP_PATH" build/ipa/Payload/
+            cd build/ipa
+            zip -r Finding-unsigned.ipa Payload
+            ls -lh *.ipa
+          else
+            echo "No .app found, listing build"
+            find build -type f | head -n 100
+          fi
+      
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: Finding-IPA
+          path: build/ipa/*.ipa
+          if-no-files-found: warn
+

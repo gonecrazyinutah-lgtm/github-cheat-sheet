@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>CFBundleName</key>
+    <string>Finding</string>
+    <key>CFBundleDisplayName</key>
+    <string>Finding</string>
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Finding needs Full Photo Library access to audit, unhide Hidden album, and export all photos/videos to your USB-C drive. This includes hidden items.</string>
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>Finding saves organized exports.</string>
+    <key>UISupportsDocumentBrowser</key>
+    <false/>
+    <key>UIFileSharingEnabled</key>
+    <true/>
+    <key>LSSupportsOpeningDocumentsInPlace</key>
+    <true/>
+    <key>NSDocumentsFolderUsageDescription</key>
+    <string>Access to USB drive via Files app</string>
+</dict>
+</plist>
